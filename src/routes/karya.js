@@ -8,8 +8,10 @@ const fileStorage = multer.diskStorage({
         cb(null, 'images');
     },
     filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        cb(null, file.fieldname + '-' + uniqueSuffix)
+        const extArray = file.mimetype.split("/");
+        const extension = extArray[extArray.length - 1];  
+        const name = Date.now() + '-' + file.originalname + '.' + extension;
+        cb(null, file.fieldname + '-' + name);
     }
 })
 
