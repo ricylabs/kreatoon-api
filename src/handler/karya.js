@@ -3,7 +3,7 @@ const { format } = require('util');
 
 const storage = new Storage({
     projectId: "kreatoon-ylabs",
-    keyFilename: "kreatoon-ylabs-c17ebd8be6a0.json"
+    keyFilename: "config/kreatoon-ylabs-c17ebd8be6a0.json"
 });
 
 const bucket = storage.bucket("kreatoon-ylabs.appspot.com");
