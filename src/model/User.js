@@ -12,6 +12,11 @@ const userSchema = mongoose.Schema({
         required: true,
         min: 6,
         max: 255
+    },
+    role: {
+        type: String,
+        required: true,
+        default: 'creator'
     }
 })
 
