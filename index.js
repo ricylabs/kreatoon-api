@@ -4,11 +4,13 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const authRoutes = require('./src/routes/auth');
 const karyaRoutes = require('./src/routes/karya')
+const karya2Routes = require('./src/routes/karya2');
 const app = express();
 
 app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/karya', karyaRoutes);
+app.use('/karya2', karya2Routes);
 
 mongoose.connect(process.env.DB_CONNECT, {
     useNewUrlParser: true,
