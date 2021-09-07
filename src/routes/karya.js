@@ -5,6 +5,7 @@ const validation = require('../handler/validation');
 
 const upload = multer({storage: multer.memoryStorage() });
 
-router.post('/upload', validation.validation, validation.creatorValidation,upload.single('image'), handler.uploadKarya);
+router.post('/upload', validation.validation, validation.creatorValidation, upload.single('image'), handler.uploadKarya);
+router.post('/create', validation.validation, validation.creatorValidation, upload.single('image'), handler.newKarya);
 
 module.exports = router;

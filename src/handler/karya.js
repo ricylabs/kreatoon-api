@@ -1,5 +1,7 @@
 const { Storage } = require('@google-cloud/storage');
 const { format } = require('util');
+const { v4: uuidv4 } = require('uuid');
+const Karya = require('../model/Karya');
 
 const storage = new Storage({
     projectId: "kreatoon-ylabs",
@@ -13,7 +15,7 @@ const uploadImageToStorage = (file) => {
         if (!file) {
             reject('No image file');
         }
-        let newFileName = `${Date.now()}_${file.originalname}`;
+        let newFileName = `${Date.now()}_${file.originalname}`
 
         let fileUpload = bucket.file(newFileName);
 
@@ -36,15 +38,50 @@ const uploadImageToStorage = (file) => {
     });
 }
 
+const newKarya = async (req, res) => {
+    const { title, desc } = req.body;
+    const { _id } = req.user;
+    const createdAt = new Date().toISOString();
+
+    const file = req.file;
+    if (file) {
+        try{
+            const url = await uploadImageToStorage(file)
+            const karya = new Karya({
+                authorId: _id,
+                title: title, 
+                desc: desc, 
+                _id: uuidv4(),
+                image: url,
+                createdAt, 
+                data: []
+            });
+            await karya.save();
+            res.status(200).send({
+                status: 'success',
+                url: url
+            });
+        } catch(err) {
+            res.send({
+                status: 'error',
+                message: err
+            })
+        }
+    }
+    
+    
+}
+
 const uploadKarya = (req, res) => {
     console.log('Upload Image');
   
-    let file = req.file;
+    const file = req.file;
     if (file) {
         uploadImageToStorage(file).then((success) => {
+
             res.status(200).send({
-            status: 'success',
-            url: success
+                status: 'success',
+                url: success
             });
         }).catch((error) => {
             console.error(error);
@@ -52,4 +89,4 @@ const uploadKarya = (req, res) => {
     }
 }
 
-module.exports = { uploadKarya }
+module.exports = { uploadKarya, newKarya }
