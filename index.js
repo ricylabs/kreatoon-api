@@ -8,6 +8,7 @@ const userRoutes = require('./src/routes/user');
 const app = express();
 
 app.use(express.json());
+app.get('/', (req, res) => res.send('halo'));
 app.use('/auth', authRoutes);
 app.use('/karya', karyaRoutes);
 app.use('/user', userRoutes);
