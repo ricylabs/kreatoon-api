@@ -2,6 +2,7 @@ const User = require('../model/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Joi = require('@hapi/joi');
+const { v4: uuidv4 } = require('uuid');
 
 const registerValidation = (data) => {
     const schema = Joi.object({
@@ -31,7 +32,7 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const hashedPass = await bcrypt.hash(password, salt);
 
-    const user = new User({ email, password: hashedPass})
+    const user = new User({ _id: uuidv4(), email, password: hashedPass})
     try{
         await user.save()
         res.send("registration success");
@@ -44,7 +45,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     const { error } = loginValidation({ email, password });
-    if( error ) return res.status(400).send(err.details[0].message);
+    if( error ) return res.status(400).send(error.details[0].message);
 
     const user = await User.findOne({ email });
     if(!user) return res.status(400).send("incorrect email/password");

@@ -1,17 +1,19 @@
 const mongoose = require('mongoose');
 
 const karyaSchema = mongoose.Schema({
-    author_id: { type: String, required: true },
-    karya: [
+    authorId: { type: String, required: true },
+    _id: { type: String, required: true },
+    title: { type: String, required: true },
+    desc: { type: String, required: true },
+    image: { type: String, required: true},
+    createdAt: { type: Date },
+    data: [
         {
-            id: { type: String, required: true },
-            title: { type: String, required: true },
-            data: [
-                {
-                    chapter: { type: Number },
-                    name: { type: String }
-                }
-            ]
+            chapter: { type: Number },
+            name: { type: String },
+            image: { type: Array},
+            createdAt: { type: Date },
+            updatedAt: { type: Date },
         }
     ]
 });
