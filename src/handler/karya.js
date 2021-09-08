@@ -10,14 +10,14 @@ const storage = new Storage({
 
 const bucket = storage.bucket("kreatoon-ylabs.appspot.com");
 
-const uploadImageToStorage = (file) => {
+const uploadImageToStorage = (file, fileName) => {
     return new Promise((resolve, reject) => {
         if (!file) {
             reject('No image file');
         }
-        let newFileName = `${Date.now()}_${file.originalname}`
+        let transformedName = fileName.replace(" ", "_");
 
-        let fileUpload = bucket.file(newFileName);
+        let fileUpload = bucket.file(transformedName);
 
         const blobStream = fileUpload.createWriteStream({
             metadata: {
@@ -38,15 +38,32 @@ const uploadImageToStorage = (file) => {
     });
 }
 
+const multipleUpload = async (files, karya, chapter, urlList) => {
+    for(let i=0; i<files.length; i++) {
+        const fileName = `${karya.title}_${karya.authorId}_${chapter}_part${i+1}_${Date.now()}`
+        let url = await uploadImageToStorage(files[i], fileName);
+        urlList.push(url);
+    }
+}
+
+const multipleDelete = async (urlList) => {
+    for(let i=0; i<urlList.length; i++) {
+        let ls = urlList[i].split('/');
+        await bucket.file(ls[4]).delete();
+    }
+
+}
+
 const newKarya = async (req, res) => {
     const { title, desc } = req.body;
     const { _id } = req.user;
     const createdAt = new Date().toISOString();
 
     const file = req.file;
+    const fileName = `${title}_${_id}`;
     if (file) {
         try{
-            const url = await uploadImageToStorage(file)
+            const url = await uploadImageToStorage(file, fileName)
             const karya = new Karya({
                 authorId: _id,
                 title: title, 
@@ -68,25 +85,97 @@ const newKarya = async (req, res) => {
             })
         }
     }
-    
-    
 }
 
-const uploadKarya = (req, res) => {
-    console.log('Upload Image');
-  
-    const file = req.file;
-    if (file) {
-        uploadImageToStorage(file).then((success) => {
-
+const uploadKarya = async (req, res) => {
+    const { title, name, chapter } = req.body;
+    const { _id } = req.user;
+    const files = req.files;
+    if (files) {
+        try{
+            const urlList = [];
+            const karya = await Karya.findOne({
+                authorId: _id,
+                title: title
+            });
+            await multipleUpload(files, karya, chapter, urlList);
+            const createdAt = new Date().toISOString();
+            const newData = {
+                chapter, name, 
+                image: urlList,
+                createdAt,
+                updatedAt: createdAt
+            };
+            karya.data.push(newData);
+            await karya.save();
             res.status(200).send({
                 status: 'success',
-                url: success
+                url: urlList
             });
-        }).catch((error) => {
-            console.error(error);
-        });
+        } catch(err) {
+            res.send({
+                status: 'error',
+                message: err
+            })
+        }
     }
 }
 
-module.exports = { uploadKarya, newKarya }
+const getKarya = async (req, res) => {
+    const { authorId, karyaId } = req.body;
+    let karya = null;
+    if(!authorId && !karyaId) {
+        karya = await Karya.find({});
+    } else if(!authorId) {
+        karya = await Karya.find({ _id: karyaId});
+    } else if(!karyaId) {
+        karya = await Karya.find({authorId});
+    } else {
+        karya = await Karya.findOne({ _id: karyaId, authorId });
+    }
+    res.send(karya);
+}
+
+const updateImage = async (req, res) => {
+    const { karyaId, chapter } = req.body;
+    const { _id } = req.user;
+    const files = req.files;
+    
+    if (files) {
+        try{
+            const urlList = [];
+            const karya = await Karya.findOne({
+                _id: karyaId, authorId: _id
+            })
+            const i = karya.data.findIndex(el => el.chapter)
+            await multipleDelete(karya.data[i].image);
+
+            await multipleUpload(files, karya, chapter, urlList);
+            
+            const updatedAt = new Date().toISOString();
+            //
+            const newData = {
+                chapter, 
+                name: karya.name, 
+                image: urlList,
+                createdAt: karya.createdAt,
+                updatedAt: updatedAt
+            };
+
+
+            karya.data.splice(i, 1, newData);
+            await karya.save();
+            res.status(200).send({
+                status: 'success',
+                url: urlList
+            });
+        } catch(err) {
+            res.send({
+                status: 'error',
+                message: err
+            })
+        }
+    }
+}
+
+module.exports = { uploadKarya, newKarya, getKarya, updateImage };

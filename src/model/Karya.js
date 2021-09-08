@@ -11,8 +11,9 @@ const karyaSchema = mongoose.Schema({
         {
             chapter: { type: Number },
             name: { type: String },
+            image: { type: Array},
             createdAt: { type: Date },
-            updatedAt: { type: Date }
+            updatedAt: { type: Date },
         }
     ]
 });
