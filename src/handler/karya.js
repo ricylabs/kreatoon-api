@@ -51,7 +51,6 @@ const multipleDelete = async (urlList) => {
         let ls = urlList[i].split('/');
         await bucket.file(ls[4]).delete();
     }
-
 }
 
 const newKarya = async (req, res) => {
@@ -137,7 +136,7 @@ const getKarya = async (req, res) => {
 }
 
 const updateImage = async (req, res) => {
-    const { karyaId, chapter } = req.body;
+    const { title, chapter } = req.body;
     const { _id } = req.user;
     const files = req.files;
     
@@ -145,7 +144,7 @@ const updateImage = async (req, res) => {
         try{
             const urlList = [];
             const karya = await Karya.findOne({
-                _id: karyaId, authorId: _id
+                title, authorId: _id
             })
             const i = karya.data.findIndex(el => el.chapter)
             await multipleDelete(karya.data[i].image);
