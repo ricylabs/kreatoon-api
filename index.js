@@ -21,8 +21,8 @@ const options = {
         name: 'Sadad'
     },
     servers: [
-        { url: 'http://localhost:8080'},
-        { url: 'https://kreatoon-ylabs.herokuapp.com'}
+        { url: 'https://kreatoon-ylabs.herokuapp.com'},
+        { url: 'http://localhost:8080'}
     ]
   },
   apis: ['index.js', './src/routes/*.js'], // files containing annotations as above
