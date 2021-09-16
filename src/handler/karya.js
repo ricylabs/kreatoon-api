@@ -54,7 +54,7 @@ const multipleDelete = async (urlList) => {
 }
 
 const newKarya = async (req, res) => {
-    const { title, desc } = req.body;
+    const { title, desc, genre, community } = req.body;
     const { _id } = req.user;
     const createdAt = new Date().toISOString();
 
@@ -65,9 +65,10 @@ const newKarya = async (req, res) => {
             const url = await uploadImageToStorage(file, fileName)
             const karya = new Karya({
                 authorId: _id,
-                title: title, 
-                desc: desc, 
+                title, 
+                desc, 
                 _id: uuidv4(),
+                genre, community,
                 image: url,
                 createdAt, 
                 data: []
@@ -90,16 +91,17 @@ const uploadKarya = async (req, res) => {
     const { _id, name, chapter } = req.body;
     const id = req.user._id;
     const files = req.files;
-    const karya = await Karya.findOne({
+
+    if (files) {
+        try{
+            const urlList = [];
+            const karya = await Karya.findOne({
                 authorId: id,
                 _id
             });
-    const i = karya.data.findIndex(el => el.chapter);
+            const i = karya.data.findIndex(el => el.chapter==chapter);
+            if(i>-1) return res.send('chapter already exists');
 
-    if (files && karya && i>-1) {
-        try{
-            const urlList = [];
-            
             await multipleUpload(files, karya, chapter, urlList);
             const createdAt = new Date().toISOString();
             const newData = {
@@ -121,31 +123,45 @@ const uploadKarya = async (req, res) => {
             })
         }
     }
-    res.status(404).send({
-        status: 'error',
-        message: 'image or karya not found'
-    })
+    else {
+        res.status(404).send({
+            status: 'error',
+            message: 'image or karya not found'
+        })
+    }
+    
 }
 
 const getKarya = async (req, res) => {
-    karya = await Karya.find({});
+    const karya = await Karya.find({});
     res.status(200).send(karya);
 }
 
-const updateImage = async (req, res) => {
-    const { _id, chapter, name,  } = req.body;
+const getKaryaById = async (req, res) => {
+    const { id } = req.params;
+
+    const karya = await Karya.findOne({ _id: id });
+    if(!karya) res.send({
+        message: "karya not found"
+    }) 
+    res.status(200).send(karya);
+}
+
+const updateChapter = async (req, res) => {
+    const { _id, chapter, name } = req.body;
     const id = req.user._id;
     const files = req.files;
-    const karya = await Karya.findOne({
+    
+    if (files) {
+        try{
+            const urlList = [];
+            const karya = await Karya.findOne({
                 _id, authorId: id
             })
 
-    const i = karya.data.findIndex(el => el.chapter)
-    if (files && karya && i!==-1) {
-        try{
-            const urlList = [];
-            
-            const i = karya.data.findIndex(el => el.chapter)
+            const i = karya.data.findIndex(el => el.chapter==chapter);
+            if(i == -1) return res.send('chapter doesnt exists');
+
             await multipleDelete(karya.data[i].image);
 
             await multipleUpload(files, karya, chapter, urlList);
@@ -174,10 +190,13 @@ const updateImage = async (req, res) => {
             })
         }
     }
-    res.status(404).send({
-        status: 'error',
-        message: 'image or karya not found'
-    })
+    else {
+        res.status(404).send({
+            status: 'error',
+            message: 'image or karya not found'
+        }) 
+    }
+    
 }
 
-module.exports = { uploadKarya, newKarya, getKarya, updateImage };
+module.exports = { uploadKarya, newKarya, getKarya, updateChapter, getKaryaById };

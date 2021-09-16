@@ -2,11 +2,11 @@ const express = require('express');
 require('dotenv').config();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const cors = require('cors');
 
 const mongoose = require('mongoose');
 const authRoutes = require('./src/routes/auth');
 const karyaRoutes = require('./src/routes/karya');
-const userRoutes = require('./src/routes/user');
 const app = express();
 
 const options = {
@@ -32,6 +32,7 @@ const specs = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.use(express.json());
+app.use(cors())
 app.get('/', (req, res) => res.send('halo'));
 
 /**
@@ -47,9 +48,9 @@ app.get('/', (req, res) => res.send('halo'));
  *  name: Karya
  *  description: Karya managing API
  */
+
 app.use('/auth', authRoutes);
 app.use('/karya', karyaRoutes);
-app.use('/user', userRoutes);
 
 mongoose.connect(process.env.DB_CONNECT, {
     useNewUrlParser: true,

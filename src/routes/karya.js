@@ -33,6 +33,12 @@ const upload = multer({storage: multer.memoryStorage() });
  *                                  description: image for cover
  *                                  type: string
  *                                  format: binary
+ *                              genre:
+ *                                  description: Karya's genre
+ *                                  type: array
+ *                              community:
+ *                                  description: Karya's community link
+ *                                  type: string
  *          responses:
  *              200:
  *                  description: Returns a success string and url to open uploaded image.
@@ -113,7 +119,7 @@ router.post('/upload', validation.validation, validation.creatorValidation, uplo
  *              200:
  *                  description: Returns a success string and url to open uploaded image.
  */
-router.put('/update', validation.validation, validation.creatorValidation, upload.array('images', 10), handler.updateImage);
+router.put('/update', validation.validation, validation.creatorValidation, upload.array('images', 10), handler.updateChapter);
 
 /**
  * @swagger
@@ -126,5 +132,23 @@ router.put('/update', validation.validation, validation.creatorValidation, uploa
  *                  description: Returns all existing Karya
  */
 router.get('/', handler.getKarya);
+
+/**
+ * @swagger
+ * /id/{id}:
+ *      get:
+ *          description: get Karya by id
+ *          tags: [Karya]
+ *          parameters:
+ *            - in: path
+ *              name: id
+ *              schema: 
+ *                  type: string
+ *              required: true
+ *          responses:
+ *              200:
+ *                  description: Returns Karya by id.
+ */
+router.get('/id/:id', handler.getKaryaById);
 
 module.exports = router;
