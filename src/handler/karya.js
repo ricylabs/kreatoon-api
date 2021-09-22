@@ -132,14 +132,13 @@ const uploadKarya = async (req, res) => {
     
 }
 
-const getKarya = async (req, res) => {
-    const karya = await Karya.find({});
-    res.status(200).send(karya);
-}
-
 const findKarya = async (req, res) => {
     const { title, genre } = req.query;
     const data = [];
+    if(!title && !genre) {
+        const karya = await Karya.find({});
+        res.status(200).send(karya);
+    }
     if(title) {
         const karya = await Karya.find({ title: { $regex: title } });
         data.push(karya)

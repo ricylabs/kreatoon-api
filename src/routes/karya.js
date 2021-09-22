@@ -123,18 +123,6 @@ router.put('/update', validation.validation, validation.creatorValidation, uploa
 
 /**
  * @swagger
- * /karya:
- *      get:
- *          description: Get all karya
- *          tags: [Karya]
- *          responses:
- *              200:
- *                  description: Returns all existing Karya
- */
-router.get('/', handler.getKarya);
-
-/**
- * @swagger
  * /id/{id}:
  *      get:
  *          description: get Karya by id
@@ -153,7 +141,7 @@ router.get('/id/:id', handler.getKaryaById);
 
 /**
  * @swagger
- * /karya/query:
+ * /karya:
  *      get:
  *          description: find existing karya by title or and/or genre
  *          tags: [Karya]
@@ -170,6 +158,6 @@ router.get('/id/:id', handler.getKaryaById);
  *              200:
  *                  description: return filtered karya  
  */
-router.get('/query', handler.findKarya);
+router.get('/', handler.findKarya);
 
 module.exports = router;
