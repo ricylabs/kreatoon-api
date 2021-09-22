@@ -151,4 +151,25 @@ router.get('/', handler.getKarya);
  */
 router.get('/id/:id', handler.getKaryaById);
 
+/**
+ * @swagger
+ * /karya/query:
+ *      get:
+ *          description: find existing karya by title or and/or genre
+ *          tags: [Karya]
+ *          parameters:
+ *            - in: query
+ *              name: title
+ *              schema: 
+ *                  type: string
+ *            - in: query
+ *              name: genre
+ *              schema: 
+ *                  type: string
+ *          responses:
+ *              200:
+ *                  description: return filtered karya  
+ */
+router.get('/query', handler.findKarya);
+
 module.exports = router;

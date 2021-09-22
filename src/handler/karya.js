@@ -137,6 +137,21 @@ const getKarya = async (req, res) => {
     res.status(200).send(karya);
 }
 
+const findKarya = async (req, res) => {
+    const { title, genre } = req.query;
+    const data = [];
+    if(title) {
+        const karya = await Karya.find({ title: { $regex: title } });
+        data.push(karya)
+    }
+    if(genre) {
+        const karya = await Karya.find({ genre: genre });
+        data.push(karya)
+    }
+    const uniqueData = [...new Set(data)];
+    res.send(uniqueData);
+}
+
 const getKaryaById = async (req, res) => {
     const { id } = req.params;
 
@@ -199,4 +214,4 @@ const updateChapter = async (req, res) => {
     
 }
 
-module.exports = { uploadKarya, newKarya, getKarya, updateChapter, getKaryaById };
+module.exports = { uploadKarya, newKarya, getKarya, updateChapter, getKaryaById, findKarya };
