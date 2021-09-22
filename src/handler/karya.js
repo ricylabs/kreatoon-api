@@ -5,7 +5,7 @@ const Karya = require('../model/Karya');
 
 const storage = new Storage({
     projectId: "kreatoon-ylabs",
-    keyFilename: "config/kreatoon-ylabs-c17ebd8be6a0.json"
+    keyFilename: "config/kreatoon-ylabs-743826024b97.json"
 });
 
 const bucket = storage.bucket("kreatoon-ylabs.appspot.com");
@@ -59,7 +59,7 @@ const newKarya = async (req, res) => {
     const createdAt = new Date().toISOString();
 
     const file = req.file;
-    const fileName = `${title}_${_id}`;
+    const fileName = `${title}_${_id}_${Date.now()}`;
     if (file) {
         try{
             const url = await uploadImageToStorage(file, fileName)
