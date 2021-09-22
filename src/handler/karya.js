@@ -137,7 +137,7 @@ const findKarya = async (req, res) => {
     const data = [];
     if(!title && !genre) {
         const karya = await Karya.find({});
-        res.status(200).send(karya);
+        return res.status(200).send(karya);
     }
     if(title) {
         const karya = await Karya.find({ title: { $regex: title } });
@@ -213,4 +213,4 @@ const updateChapter = async (req, res) => {
     
 }
 
-module.exports = { uploadKarya, newKarya, getKarya, updateChapter, getKaryaById, findKarya };
+module.exports = { uploadKarya, newKarya, updateChapter, getKaryaById, findKarya };
